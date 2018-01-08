@@ -8,23 +8,22 @@ except ImportError as e:
     sys.exit()
 
 
-def help_(cmd=None):
+def help_():
     """Help (commands)."""
-    if cmd is None:
-        print("Help about all...")
-    else:
-        print("Help[cmd]... Here will be dict with help...")
+    print("ls - list dir\r\nuser - user for login\r\nget - download file in current dir"
+          "cd - change directory\r\npwd - current directory\r\nquit - quit from app\r\n"
+          "...")
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Simple ftp client.")
     parser.add_argument("host", help="Host to connect.")
     parser.add_argument('port', help='Port to connect.', nargs='?', type=int, default=21)
-    parser.add_argument("--passive", '-p', help="Use passive mode or not.", action="store_true", dest='passive')
+    parser.add_argument("--passive", help="Use passive mode.", action="store_true")
     return parser.parse_args()
 
 
-COMMANDS = {"ls": list_, "user": user, "pass": pass_, "cd": cwd, "pwd": pwd, "quit": quit_, "?": help_}
+COMMANDS = {"ls": list_, "user": user, "cd": cwd, "pwd": pwd, "quit": quit_, "help": help_}
 
 
 def main():
@@ -43,11 +42,17 @@ def main():
             cmd = input_[0].lower()
             arg = input_[1] if len(input_) > 1 else ''
             try:
-                COMMANDS[cmd](control, arg) if arg != '' else COMMANDS[cmd](control)
+                if cmd == 'help' or cmd == '?':
+                    help_()
+                else:
+                    COMMANDS[cmd](control, arg) if arg != '' else COMMANDS[cmd](control)
             except KeyError:
-                print(f"Unsupported command {cmd}.")
+                print(f"Unsupported command {cmd}.", file=sys.stderr)
+            except TypeError:
+                print(f"Command {cmd} doesn't takes arguments.", file=sys.stderr)
             except Exception as exception:
                 print(exception, file=sys.stderr)
+                sys.exit()
 
     except ConnectionError as exception:
         print(exception, file=sys.stderr)
