@@ -103,23 +103,23 @@ def port_(control):  # <--- ACTIVE MODE
     return conn_handler
 
 
-def get_data(control, cmd):
+def get_data(control, cmd, arg=''):
     """Gets data by command depends on active/passive mode."""
     if not PASV:
         temp = port_(control)
-        send_cmd(control, cmd)
+        send_cmd(control, cmd, arg)
         print(control.recv(MAX_LINE).decode().replace('\r\n', ''))  # msg before data transport
         data_conn, addr = temp.accept()
     else:
         data_conn = pasv(control)
-        send_cmd(control, cmd)
+        send_cmd(control, cmd, arg)
         print(control.recv(MAX_LINE).decode().replace('\r\n', ''))  # msg before data transport
-    return receive_bytes(data_conn, MAX_WIN).decode()
+    return receive_bytes(data_conn, MAX_WIN)
 
 
 def list_(control):
     """LIST command."""
-    data = get_data(control, "list")
+    data = get_data(control, "list").decode()
     print(data[:-1])  # remove last \r\n
     print_reply(control)
 
@@ -136,6 +136,14 @@ def cwd(control, path):
 def pwd(control):
     """PWD command."""
     send_cmd(control, "pwd")
+    print_reply(control)
+
+
+def get(control, filename):
+    """RETR command."""
+    data = get_data(control, "retr", filename)
+    with open(filename, 'wb') as file:
+        file.write(data)
     print_reply(control)
 
 

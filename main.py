@@ -1,8 +1,9 @@
+import sys
 import argparse
 
 
 try:
-    from ftp import *
+    import ftp
 except ImportError as e:
     print(e, file=sys.stderr)
     sys.exit()
@@ -23,19 +24,18 @@ def parse_args():
     return parser.parse_args()
 
 
-COMMANDS = {"ls": list_, "user": user, "cd": cwd, "pwd": pwd, "quit": quit_, "help": help_}
+COMMANDS = {"ls": ftp.list_, "user": ftp.user, "cd": ftp.cwd, "pwd": ftp.pwd, "get": ftp.get, "quit": ftp.quit_, "help": help_}
 
 
 def main():
     args = parse_args()
-    global PASV
-    PASV = True if args.passive else False
+    ftp.PASV = True if args.passive else False
     try:
-        control = create_connection(args.host, args.port)
+        control = ftp.create_connection(args.host, args.port)
         print(f"Connecting to {args.host}...")
-        print_reply(control)
+        ftp.print_reply(control)
 
-        user(control)
+        ftp.user(control)
 
         while True:
             input_ = input("ftp> ").split(' ')
