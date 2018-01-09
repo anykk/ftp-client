@@ -31,7 +31,7 @@ def main():
     args = parse_args()
     ftp.PASV = True if args.passive else False
     try:
-        control = ftp.create_connection(args.host, args.port)
+        control = ftp.connect(args.host, args.port)
         print(f"Connecting to {args.host}...")
         ftp.print_reply(control)
 
