@@ -1,8 +1,9 @@
+import sys
 import getpass
 import ftplib_
 
 
-def _setpasv(val):
+def setpasv(val):
     """Set PASV mode if val is True or PORT mode if val is False."""
     ftplib_._pasv = val
 
@@ -10,8 +11,10 @@ def _setpasv(val):
 def open_(host, port=ftplib_._port):
     """Connect to remote ftp."""
     control = ftplib_.connect(host, port)
+    print(f'Connecting to {host}...')
     resp = ftplib_.getresp(control)
     print(resp)
+    return control
 
 
 def user(control):
@@ -43,7 +46,7 @@ def ls(control):
 
 def get(control):
     """Get file."""
-    filename = input('Remote filename (local): ')
+    filename = input('Remote filename: ')
     if not filename:
         print('Please write filename!')
         return
@@ -77,6 +80,16 @@ def quit_(control):
     """Close ftp session and quit."""
     resp = ftplib_.sendquit(control)
     print(resp)
+    sys.exit()
+
+
+def help(cmd):
+    """Print short info about command."""
+    if cmd == '':
+        for command in COMMANDS:
+            print(command)
+    else:
+        print(COMMANDS[cmd].__doc__)
 
 
 COMMANDS = {'user': user,
@@ -87,4 +100,5 @@ COMMANDS = {'user': user,
             'put': put,
             'size': size,
             'quit': quit_,
+            'help': help
             }
