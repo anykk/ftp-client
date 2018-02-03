@@ -215,7 +215,7 @@ def sendretr(control, filename, destname=''):
     if not destname:
         destname = filename
     with open(destname, 'wb') as fd:
-        return retrbytes(control, 'RETR ' + destname, fd.write)
+        return retrbytes(control, 'RETR ' + filename, fd.write)
 
 
 def sendstor(control, filename, destname=''):  # TODO: UPGRADE TO 'APPE'

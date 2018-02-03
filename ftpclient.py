@@ -62,8 +62,11 @@ def put(control):
         print('Please write filename!')
         return
     destname = input('Remote filename (Default = local filename): ')
-    resp = ftplib_.sendstor(control, filename, destname)
-    print(resp)
+    try:
+        resp = ftplib_.sendstor(control, filename, destname)
+        print(resp)
+    except FileNotFoundError:
+        print(f"Can't find '{filename}'.", 'Please check filename.', sep='\n', file=sys.stderr)
 
 
 def size(control):

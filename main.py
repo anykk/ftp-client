@@ -21,8 +21,25 @@ def main():
     setpasv(args.passive)
     try:
         control = open_(args.host, args.port)
+    except ftplib_.socket.timeout:
+        print('Timeout.', file=sys.stderr)
+        sys.exit()
+    except ftplib_.ConnectError as e:
+        print(e, file=sys.stderr)
+        sys.exit()
+    except ftplib_.AddressError as e:
+        print(e, file=sys.stderr)
+        sys.exit()
+    try:
         user(control)
-        while 1:
+    except KeyboardInterrupt:
+        quit_(control)
+        sys.exit()
+    except (ftplib_.ReplyError, ftplib_.TempError, ftplib_.PermError, ftplib_.ProtoError) as e:
+        print(e, file=sys.stderr)
+        user(control)
+    while 1:
+        try:
             cmd = input('ftp> ').split()
             if len(cmd) >= 1 and cmd[0] == 'help':
                 try:
@@ -32,27 +49,17 @@ def main():
                 except KeyError:
                     print(f"Can't show help for {cmd[1]}.")
             elif len(cmd) > 1 and cmd[0] != 'help':
-                print("Commands don't take arguments.")
+                print("Command doesn't take arguments.")
             else:
-                try:
-                    COMMANDS[cmd[0]](control)
-                except KeyError:
-                    print(f"{cmd[0]} cmd doesn't supports")
-    except (ftplib_.ReplyError, ftplib_.TempError, ftplib_.PermError, ftplib_.ProtoError) as e:
-        print(e, file=sys.stderr)
-    except ftplib_.ConnectError as e:
-        print(e, file=sys.stderr)
-        sys.exit()
-    except ftplib_.AddressError as e:
-        print(e, file=sys.stderr)
-        sys.exit()
-    except KeyboardInterrupt:
-        quit_(control)
-    except ftplib_.socket.timeout:
-        print('Timeout.')
-    except Exception as e:
-        print(e, file=sys.stderr)
-        sys.exit()
+                COMMANDS[cmd[0]](control)
+        except KeyError:
+            print(f"{cmd[0]} cmd doesn't supports")
+        except ftplib_.socket.timeout:
+            print('Timeout.', file=sys.stderr)
+        except KeyboardInterrupt:
+            quit_(control)
+        except (ftplib_.ReplyError, ftplib_.TempError, ftplib_.PermError, ftplib_.ProtoError) as e:
+            print(e, file=sys.stderr)
 
 
 if __name__ == "__main__":
