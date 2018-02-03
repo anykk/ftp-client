@@ -12,4 +12,4 @@ Simple python3 ftp-client implementation based on sockets.
 - put - put local file into remote ftp
 - size - show size of chosen file
 - quit - quit from ftp client
-> for help use "?" or "help"
+> for help use "help" command
